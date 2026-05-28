@@ -34,70 +34,61 @@ export default function App() {
           className="home-add-icon border rounded-full border-gray-300 "
         />
       </View>
+      <FlatList
+        ListHeaderComponent={() => (
+          <>
+            <View className="home-balance-card">
+              <Text className="home-balance-label">Balance</Text>
+              <View className="home-balance-row">
+                <Text className="home-balance-amount">
+                  {formatCurrency(HOME_BALANCE.amount, 'KES')}
+                </Text>
+                <Text className="home-balance-date">
+                  {dayjs(HOME_BALANCE.nextRenewalDate).format('MM/DD')}
+                </Text>
+              </View>
+            </View>
 
-      <View className="home-balance-card">
-        <Text className="home-balance-label">Balance</Text>
-        <View className="home-balance-row">
-          <Text className="home-balance-amount">
-            {formatCurrency(HOME_BALANCE.amount, 'KES')}
-          </Text>
-          <Text className="home-balance-date">
-            {dayjs(HOME_BALANCE.nextRenewalDate).format('MM/DD')}
-          </Text>
-        </View>
-      </View>
-
-      <View>
-        <ListHeading title="Upcoming" />
-        <FlatList
-          data={UPCOMING_SUBSCRIPTIONS}
-          renderItem={({ item }) => <UpcomingSubscriptionCard data={item} />}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          ListEmptyComponent={
-            <Text className="home-empty-state">No upcoming renewals</Text>
-          }
-        />
-      </View>
-
-      <View className="flex-1">
-        <ListHeading title="All Subscription" />
-        <FlatList
-          keyExtractor={(item) => item.id}
-          data={HOME_SUBSCRIPTIONS}
-          renderItem={({ item }) => (
-            <SubscriptionCard
-              data={{
-                ...item,
-                expanded: expandedSubscriptionId === item.id,
-                onPress: () =>
-                  setExpandedSubscriptionId((currentId) =>
-                    currentId === item.id ? null : item.id,
-                  ),
-              }}
-            />
-          )}
-          extraData={expandedSubscriptionId}
-          ItemSeparatorComponent={() => <View className="h-4" />}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <Text className="home-empty-state">No Subscriptions yet.</Text>
-          }
-        />
-        {/* <SubscriptionCard
-          data={{
-            ...HOME_SUBSCRIPTIONS[0],
-            expanded: expandedSubscriptionId === HOME_SUBSCRIPTIONS[0].id,
-            onPress: () =>
-              setExpandedSubscriptionId((currentId) =>
-                currentId === HOME_SUBSCRIPTIONS[0].id
-                  ? null
-                  : HOME_SUBSCRIPTIONS[0].id,
-              ),
-          }}
-        /> */}
-      </View>
+            <View className="mb-5">
+              <ListHeading title="Upcoming" />
+              <FlatList
+                data={UPCOMING_SUBSCRIPTIONS}
+                renderItem={({ item }) => (
+                  <UpcomingSubscriptionCard data={item} />
+                )}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                ListEmptyComponent={
+                  <Text className="home-empty-state">No upcoming renewals</Text>
+                }
+              />
+            </View>
+            <ListHeading title="All Subscriptions" />
+          </>
+        )}
+        keyExtractor={(item) => item.id}
+        data={HOME_SUBSCRIPTIONS}
+        renderItem={({ item }) => (
+          <SubscriptionCard
+            data={{
+              ...item,
+              expanded: expandedSubscriptionId === item.id,
+              onPress: () =>
+                setExpandedSubscriptionId((currentId) =>
+                  currentId === item.id ? null : item.id,
+                ),
+            }}
+          />
+        )}
+        extraData={expandedSubscriptionId}
+        ItemSeparatorComponent={() => <View className="h-4" />}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <Text className="home-empty-state">No Subscriptions yet.</Text>
+        }
+        contentContainerClassName="pb-30"
+      />
     </SafeAreaView>
   );
 }
