@@ -1,7 +1,9 @@
 import ListHeading from '@/components/ListHeading';
+import SubscriptionCard from '@/components/SubscriptionCard';
 import UpcomingSubscriptionCard from '@/components/UpcomingSubscriptionCard';
 import {
   HOME_BALANCE,
+  HOME_SUBSCRIPTIONS,
   HOME_USER,
   UPCOMING_SUBSCRIPTIONS,
 } from '@/constants/data';
@@ -10,12 +12,16 @@ import images from '@/constants/image';
 import { formatCurrency } from '@/lib/utils';
 import dayjs from 'dayjs';
 import { styled } from 'nativewind';
+import { useState } from 'react';
 import { FlatList, Image, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 
 const SafeAreaView = styled(RNSafeAreaView);
 
 export default function App() {
+  const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<
+    string | null
+  >(null);
   return (
     <SafeAreaView className="flex-1 bg-background p-5">
       <View className="home-header">
@@ -55,30 +61,43 @@ export default function App() {
         />
       </View>
 
-      <View>
-        <ListHeading title="Subscription" />
+      <View className="flex-1">
+        <ListHeading title="All Subscription" />
+        <FlatList
+          keyExtractor={(item) => item.id}
+          data={HOME_SUBSCRIPTIONS}
+          renderItem={({ item }) => (
+            <SubscriptionCard
+              data={{
+                ...item,
+                expanded: expandedSubscriptionId === item.id,
+                onPress: () =>
+                  setExpandedSubscriptionId((currentId) =>
+                    currentId === item.id ? null : item.id,
+                  ),
+              }}
+            />
+          )}
+          extraData={expandedSubscriptionId}
+          ItemSeparatorComponent={() => <View className="h-4" />}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <Text className="home-empty-state">No Subscriptions yet.</Text>
+          }
+        />
+        {/* <SubscriptionCard
+          data={{
+            ...HOME_SUBSCRIPTIONS[0],
+            expanded: expandedSubscriptionId === HOME_SUBSCRIPTIONS[0].id,
+            onPress: () =>
+              setExpandedSubscriptionId((currentId) =>
+                currentId === HOME_SUBSCRIPTIONS[0].id
+                  ? null
+                  : HOME_SUBSCRIPTIONS[0].id,
+              ),
+          }}
+        /> */}
       </View>
-
-      {/* <Text className="text-7xl font-sans-extrabold text-primary">Home</Text>
-
-      <Link
-        href="/onboarding"
-        className="mt-4 font-sans-bold rounded bg-primary text-white p-4"
-      >
-        Go to onboarding
-      </Link>
-      <Link
-        href="/(auth)/sign-in"
-        className="mt-4 font-sans-bold rounded bg-primary text-white p-4"
-      >
-        Go to Sign In
-      </Link>
-      <Link
-        href="/(auth)/sign-up"
-        className="mt-4 font-sans-bold rounded bg-primary text-white p-4"
-      >
-        Go to Sign Up
-      </Link> */}
     </SafeAreaView>
   );
 }
