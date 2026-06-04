@@ -1,24 +1,37 @@
 import { tabs } from '@/constants/data';
 import { colors, components } from '@/constants/theme';
+import { useAuth } from '@clerk/expo';
 import clsx from 'clsx';
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import { Image, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const tabBar = components.tabBar;
 
+const TabIcon = ({ focused, icon }: TabIconProps) => {
+  return (
+    <View className="tabs-icon">
+      <View className={clsx('tabs-pill', focused && 'tabs-active')}>
+        <Image resizeMode="contain" source={icon} className="tabs-glyph" />
+      </View>
+    </View>
+  );
+};
+
 const TabLayout = () => {
   const insets = useSafeAreaInsets();
 
-  const TabIcon = ({ focused, icon }: TabIconProps) => {
-    return (
-      <View className="tabs-icon">
-        <View className={clsx('tabs-pill', focused && 'tabs-active')}>
-          <Image resizeMode="contain" source={icon} className="tabs-glyph" />
-        </View>
-      </View>
-    );
-  };
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (!isLoaded) {
+    return null;
+  }
+
+  // Redirect to sign-in if user is not authenticated
+  if (!isSignedIn) {
+    return <Redirect href="/(auth)/sign-in" />;
+  }
+
   return (
     <Tabs
       screenOptions={{
