@@ -1,6 +1,8 @@
 import { useSignIn } from '@clerk/expo';
+import AntDesign from '@expo/vector-icons/AntDesign';
 import { Link, useRouter, type Href } from 'expo-router';
 import { styled } from 'nativewind';
+import { usePostHog } from 'posthog-react-native';
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -12,7 +14,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
-import { usePostHog } from 'posthog-react-native';
 
 const SafeAreaView = styled(RNSafeAreaView);
 
@@ -26,6 +27,7 @@ const SignIn = () => {
   const [code, setCode] = useState('');
 
   // Validation states
+  const [showPassword, setShowPassword] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
 
@@ -285,16 +287,34 @@ const SignIn = () => {
 
                 <View className="auth-field">
                   <Text className="auth-label">Password</Text>
-                  <TextInput
-                    className={`auth-input ${passwordTouched && !passwordValid && 'auth-input-error'}`}
-                    value={password}
-                    placeholder="Enter your password"
-                    placeholderTextColor="rgba(0, 0, 0, 0.4)"
-                    secureTextEntry
-                    onChangeText={setPassword}
-                    onBlur={() => setPasswordTouched(true)}
-                    autoComplete="password"
-                  />
+                  <View style={{ position: 'relative' }}>
+                    <TextInput
+                      className={`auth-input ${passwordTouched && !passwordValid && 'auth-input-error'}`}
+                      value={password}
+                      placeholder="Enter your password"
+                      placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                      secureTextEntry={!showPassword}
+                      onChangeText={setPassword}
+                      onBlur={() => setPasswordTouched(true)}
+                      autoComplete="password"
+                    />
+                    <Pressable
+                      onPress={() => setShowPassword((prev) => !prev)}
+                      style={{
+                        position: 'absolute',
+                        right: 12,
+                        top: 0,
+                        bottom: 0,
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <AntDesign
+                        name={showPassword ? 'eye' : 'eye-invisible'}
+                        size={24}
+                        color="black"
+                      />
+                    </Pressable>
+                  </View>
                   {passwordTouched && !passwordValid && (
                     <Text className="auth-error">Password is required</Text>
                   )}
